@@ -25,7 +25,9 @@ body > div {
 }
 
 #answers {
+    align-self: flex-start;
     width: 90%;
+    height: 80%;
     margin: 0% 5%;
 }
 
@@ -46,6 +48,7 @@ body > div {
     align-self: center;
     width: 70%;
     margin: 0% 5%;
+    white-space: pre-wrap;
 }
 
 #answers > div > div:nth-child(3) {
@@ -55,6 +58,7 @@ body > div {
 }
 
 #sum {
+    align-self: flex-end;
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
@@ -68,6 +72,8 @@ body > div {
 }
 
 #score {
+    align-self: flex-end;
+    width: 100%;
     color: #040204;
     background: #ACAA64;
     width: 100%;
@@ -95,16 +101,4 @@ body > div {
     text-align: right;
     text-align: center;
     margin: 0% 5%;
-}
-
-
-.typed {
-    width: 100%;
-    white-space:nowrap;
-    overflow:hidden;
-    animation: type 5s steps(100 , end);
-}
-
-@keyframes type {
-    from { width: 0; }
 }
