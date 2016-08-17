@@ -1,5 +1,8 @@
 "use strict";
 
+/*
+ * inspired by: http://www.html5rocks.com/en/tutorials/webaudio/intro/js/buffer-loader.js
+ */
 function loadBuffers(context, urlList, callback) {
   const bufferList = [];
   let loadCount = 0;
@@ -8,7 +11,6 @@ function loadBuffers(context, urlList, callback) {
     const request = new XMLHttpRequest();
     request.open("GET", url, true);
     request.responseType = "arraybuffer";
-
 
     request.onload = () => {
       context.decodeAudioData(
@@ -19,8 +21,9 @@ function loadBuffers(context, urlList, callback) {
             return;
           }
           bufferList[index] = buffer;
-          if (++loadCount === urlList.length)
+          if (++loadCount === urlList.length) {
             callback(bufferList);
+          }
         },
         error => {
           console.error("decodeAudioData error", error);
