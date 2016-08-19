@@ -2,7 +2,8 @@
 
 const samples = new Samples(new AudioContext());
 
-const EMPTY_ANSWER = "................";
+const EMPTY_ANSWER = "...................";
+const EMPTY_SHORT_ANSWER = ".............";
 const EMPTY_POINTS = "--";
 const EMPTY_XXX = "";
 const DIFF_RESET = [[]];
@@ -13,7 +14,7 @@ const SPECIAL_FIELDS = {
   x: (div, from, to) => { samples.play(2); div.textContent = to; }
 };
 
-const ROUND_FIELD = [
+const ROUND_FIELD = [ "r", [
   ["answers", [
     ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a2",  [["l", 2], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
@@ -24,7 +25,27 @@ const ROUND_FIELD = [
   ]],
   ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-];
+]];
+
+const FINAL_FIELD = [ "f", [
+  ["answers", [
+    ["player1", [
+      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a2", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+    ]],
+    ["player2", [
+      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a2", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+    ]]]],
+  ["points", [["l", "summe"], ["p", 0]]],
+  ["score",  [["round", 0]]]
+]];
 
 let current = {};
 
@@ -71,8 +92,9 @@ function reduce(list, reduced, prefix) {
 }
 
 function reduceRound(list) {
+  let [prefix, round] = list;
   const reduced = [];
-  reduce(list, reduced, "r");
+  reduce(round, reduced, prefix);
   return reduced;
 }
 
@@ -83,7 +105,7 @@ function oneDiff(a, b) {
       if (a[i][0] === b[i][0]) {
         if (a[i][1] !== b[i][1]) {
           if (changed.length === 0) {
-             changed = [a[i], b[i]];
+            changed = [a[i], b[i]];
           } else {
             return DIFF_RESET;
           }
@@ -128,17 +150,19 @@ function createDivs(div, row, prefix) {
 }
 
 function setField(to) {
+  let [prefix, round] = to;
   document.body.removeChild(document.querySelector("#field"));
   const field = document.createElement("div");
   field.setAttribute("id", "field");
-  createDivs(field, to, "r");
+  field.setAttribute("class", prefix);
+  createDivs(field, round, prefix);
   document.body.appendChild(field);
   current = to;
 }
 
-setField(ROUND_FIELD);
+setField(FINAL_FIELD);
 
-const TEST_X = [
+const TEST_X = ["r", [
   ["answers", [
     ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a2",  [["l", 2], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
@@ -149,9 +173,9 @@ const TEST_X = [
   ]],
   ["points", [["x", "x"], ["l", "summe"], ["p", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-];
+]];
 
-const TEST_A = [
+const TEST_A = ["r", [
   ["answers", [
     ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a2",  [["l", 2], ["a", "foobar 2000" ], ["p", EMPTY_POINTS ]]],
@@ -162,8 +186,8 @@ const TEST_A = [
   ]],
   ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-];
-const TEST_P = [
+]];
+const TEST_P = ["r", [
   ["answers", [
     ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a2",  [["l", 2], ["a", "foobar 2000" ], ["p", 42 ]]],
@@ -174,4 +198,24 @@ const TEST_P = [
   ]],
   ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-];
+]];
+
+const TEST_F = [ "f", [
+  ["answers", [
+    ["player1", [
+      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a2", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+    ]],
+    ["player2", [
+      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a2", [["a", "hey ho lets go foo bar" ], ["p", EMPTY_POINTS ]]],
+      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
+    ]]]],
+  ["points", [["l", "summe"], ["p", 0]]],
+  ["score",  [["round", 0]]]
+]];

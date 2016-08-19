@@ -17,11 +17,69 @@ body > div {
     height: 640px;
     background: #040204;
     color: #ACAA64;
-    font-size: 64px;
+    font-size: 60px;
     font-family: VT323, monospace;
     text-transform: uppercase;
     display: flex;
     flex-direction: column;
+}
+
+.a {
+    overflow: hidden;
+    height: 1em;
+}
+
+#f-answers {
+    align-self: flex-start;
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: row;
+}
+
+#f-answers > div {
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.player1 {
+    margin-left: 8%;
+    margin-right: 2%
+}
+
+.player2 {
+    margin-left: 2%;
+    margin-right: 8%
+}
+
+.player1 > div {
+    display: flex;
+    flex-direction: row;
+}
+
+.player1 .a {
+    text-align: right;
+    margin-right: 5%;
+}
+
+.player2 .a {
+    text-align: left;
+    margin-left: 5%;
+}
+
+.player2 > div {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.f .points .l {
+    margin-right: 2%;
+}
+
+.f .points .p {
+    margin-right: 2%;
 }
 
 #r-answers {
@@ -57,11 +115,12 @@ body > div {
     text-align: right;
 }
 
-#r-points {
-    align-self: flex-end;
+.points {
+    align-self: flex-start;
     width: 100%;
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 #r-points-x {
@@ -86,7 +145,7 @@ body > div {
     margin: 0% 5%;
 }
 
-#r-score {
+.score {
     align-self: flex-end;
     width: 100%;
     color: #040204;
@@ -94,6 +153,7 @@ body > div {
     width: 100%;
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 #r-score-teamA {
@@ -103,7 +163,7 @@ body > div {
     margin: 0% 5%;
 }
 
-#r-score-round {
+.score .round {
     align-self: center;
     width: 50%;
     text-align: center;
