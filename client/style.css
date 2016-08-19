@@ -1,0 +1,30 @@
+/* latin */
+@font-face {
+    font-family: 'VT323';
+    font-style: normal;
+    font-weight: 400;
+    src: local('VT323'), local('VT323-Regular'), url(vt323.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+#field {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+    margin: -320px 0 0 -512px;
+    width: 1024px;
+    height: 640px;
+    background: #040204;
+    color: #ACAA64;
+    font-size: 60px;
+    font-family: VT323, monospace;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+}
+
+.a {
+    overflow: hidden;
+    height: 1em;
+}
