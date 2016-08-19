@@ -6,10 +6,24 @@
     cursor: pointer;
 }
 
+.round-selector {
+    cursor: pointer;
+}
+
+
+.selected {
+    background-color: rgba(32, 32, 32, 0.3);
+}
+
 .marked {
     background-color: rgba(0, 100, 0, 0.3);
 }
 
 .r {
     width: 30%;
+}
+
+#round-control {
+    display: flex;
+    flex-direction: row;
 }

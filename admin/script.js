@@ -16,9 +16,27 @@ function CCDIV(cls, content) {
   return div;
 }
 
+function serializeRound() {
+  const round = document.querySelector("#round");
+}
+
 function loadGame(data) {
-  let [rounds, final] = data.split("#final\n");
-  return [rounds, final];
+  let [roundsSection, finalSection] = data.split("#final\n");
+  const rounds = loadRounds(roundsSection);
+  const roundControl = document.querySelector("#round-control");
+  for (let round of rounds) {
+    let [n, q, a] = round;
+    const button = CCDIV("round-selector", `round ${n}`);
+    button.addEventListener("click", e => {
+      for (let d of document.querySelectorAll(".selected")) {
+        d.classList.remove("selected");
+      }
+      const cls = e.target.classList;
+      cls.add("selected");
+      displayRound(n, q, a);
+    });
+    roundControl.appendChild(button);
+  }
 }
 
 function loadRounds(roundsString) {
@@ -26,7 +44,11 @@ function loadRounds(roundsString) {
   if (rounds.length != 4) {
     console.error("rounds != 4");
   }
-  return rounds.map(r => r.trim());
+  return rounds.map(r => r.trim()).map(r => {
+    let [name, question, ...answers] = r.split("\n");
+    const number = parseInt(name.charAt(5));
+    return [number, question, answers];
+  });
 }
 
 function populateRoundAnswer(number, line) {
@@ -53,14 +75,11 @@ function makeRound() {
   return div;
 }
 
-function displayRound(round) {
-  let [name, question, ...answers] = round.split("\n");
-  console.log(name);
-  const number = parseInt(name.charAt(5));
+function displayRound(number, question, answers) {
   const oldRound = document.querySelector("#round");
   const newRound = DIV();
   newRound.setAttribute("id", "round");
-  newRound.appendChild(CCDIV("q", `${name}: ${question}`));
+  newRound.appendChild(CCDIV("q", `${number}: ${question}`));
   newRound.appendChild(makeRound());
 
   const parent = oldRound.parentNode;
@@ -84,3 +103,5 @@ function clicky(selector) {
 function update() {
   SELECTABLE.forEach(s => clicky(s));
 }
+
+loadGame(DATA);
