@@ -73,8 +73,9 @@ function typeAnswer(div, displayed, remaining, sound, duration, pos=0) {
 
 function updateField(selector, from, to) {
   const div = document.querySelector(`#${selector}`);
-  if (div && div.className in SPECIAL_FIELDS) {
-    SPECIAL_FIELDS[div.className](div, from, to);
+  const cls = Object.keys(SPECIAL_FIELDS).filter(k => div.classList.contains(k));
+  if (cls.length === 1) {
+    SPECIAL_FIELDS[cls[0]](div, from, to);
   } else {
     div.textContent = to;
   }

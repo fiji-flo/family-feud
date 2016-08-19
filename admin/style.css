@@ -1,0 +1,15 @@
+.a {
+    cursor: pointer;
+}
+
+.p {
+    cursor: pointer;
+}
+
+.marked {
+    background-color: rgba(0, 100, 0, 0.3);
+}
+
+.r {
+    width: 30%;
+}
