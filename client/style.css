@@ -38,33 +38,48 @@ body > div {
     flex-direction: row;
 }
 
-#r-answers > div > div:nth-child(1) {
+#r-answers .l {
     align-self: flex-start;
     width: 10%;
     text-align: right;
 }
 
-#r-answers > div > div:nth-child(2) {
+#r-answers .a {
     align-self: center;
     width: 70%;
     margin: 0% 5%;
     white-space: pre-wrap;
 }
 
-#r-answers > div > div:nth-child(3) {
+#r-answers .p {
     align-self: flex-end;
     width: 10%;
     text-align: right;
 }
 
-#r-sum {
+#r-points {
     align-self: flex-end;
     width: 100%;
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
 }
 
-#r-sum > div {
+#r-points-x {
+    align-self: flex-end;
+    width: 10%;
+    text-align: center;
+    margin-left: 45%;
+    margin-right: 5%;
+}
+
+#r-points-l {
+    align-self: flex-end;
+    width: 10%;
+    text-align: right;
+    margin-left: 10%;
+}
+
+#r-points-p {
     align-self: flex-end;
     width: 10%;
     text-align: right;
@@ -81,21 +96,21 @@ body > div {
     flex-direction: row;
 }
 
-#r-score > div:nth-child(1) {
+#r-score-teamA {
     align-self: flex-start;
     width: 10%;
     text-align: center;
     margin: 0% 5%;
 }
 
-#r-score > div:nth-child(2) {
+#r-score-round {
     align-self: center;
     width: 50%;
     text-align: center;
     margin: 0% 5%;
 }
 
-#r-score > div:nth-child(3) {
+#r-score-teamB {
     align-self: flex-end;
     width: 10%;
     text-align: right;
