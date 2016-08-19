@@ -88,7 +88,7 @@ function update(from, to) {
   const change = oneDiff(reduceRound(from), reduceRound(to));
   if (change === DIFF_RESET) {
     console.log("DOOM");
-    setField(to);
+    current = setField(to);
   } else if (change.length === 0) {
     return;
   } else {

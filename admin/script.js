@@ -16,8 +16,18 @@ function CCDIV(cls, content) {
   return div;
 }
 
+function serialize(div) {
+  const cls = div.classList.item(0);
+  if (div.childElementCount === 0) {
+    return [cls, div.textContent];
+  } else {
+    return [cls, [...div.childNodes].map(d => serialize(d))];
+  }
+}
+
 function serializeRound() {
-  const round = document.querySelector("#round");
+  const round = document.querySelector("#round .r");
+  const field = serialize(round);
 }
 
 function loadGame(data) {
@@ -68,8 +78,8 @@ function populateRoundAnswers(answers) {
   }
 }
 
-function makeRound() {
-  let [prefix, round] = ROUND_FIELD;
+function makeRound(number) {
+  let [prefix, round] = ROUND_FIELDS(number);
   const div = CCDIV(prefix);
   createDivs(div, round, prefix);
   return div;
@@ -80,7 +90,7 @@ function displayRound(number, question, answers) {
   const newRound = DIV();
   newRound.setAttribute("id", "round");
   newRound.appendChild(CCDIV("q", `${number}: ${question}`));
-  newRound.appendChild(makeRound());
+  newRound.appendChild(makeRound(QUESTIONS[number]));
 
   const parent = oldRound.parentNode;
   parent.replaceChild(newRound, oldRound);
@@ -92,7 +102,7 @@ function clicky(selector) {
   const divs = document.querySelectorAll(selector);
   divs.forEach(d => d.addEventListener("click", e => {
     const cls = e.target.classList;
-    if (cls.contains("marked")) {
+    if (cls.contains("marked") && window.confirm("sure?")) {
       cls.remove("marked");
     } else {
       cls.add("marked");
