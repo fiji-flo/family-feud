@@ -112,66 +112,10 @@ function update(from, to) {
 }
 
 ws.onmessage = e => {
-  update(current, JSON.parse(e.data));
+  const {t, payload} = JSON.parse(e.data);
+  if (t === "update") {
+    update(current, payload);
+  } else if (t === "sound") {
+    samples.play(payload);
+  }
 };
-
-
-current = setField(FINAL_FIELD);
-
-const TEST_X = ["r", [
-  ["answers", [
-    ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a2",  [["l", 2], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a3",  [["l", 3], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a4",  [["l", 4], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
-  ]],
-  ["points", [["x", "x"], ["l", "summe"], ["sum", 0]]],
-  ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-]];
-
-const TEST_A = ["r", [
-  ["answers", [
-    ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a2",  [["l", 2], ["a", "foobar 2000" ], ["p", EMPTY_POINTS ]]],
-    ["a3",  [["l", 3], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a4",  [["l", 4], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
-  ]],
-  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 2]]],
-  ["score",  [["teamA", 123], ["round", 66], ["teamB", 0]]]
-]];
-const TEST_P = ["r", [
-  ["answers", [
-    ["a1",  [["l", 1], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a2",  [["l", 2], ["a", "foobar 2000" ], ["p", 42 ]]],
-    ["a3",  [["l", 3], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a4",  [["l", 4], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
-  ]],
-  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 0]]],
-  ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
-]];
-
-const TEST_F = [ "f", [
-  ["answers", [
-    ["player1", [
-      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a2", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ]],
-    ["player2", [
-      ["a1", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a2", [["a", "hey ho lets go foo bar" ], ["p", EMPTY_POINTS ]]],
-      ["a3", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-      ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
-    ]]]],
-  ["points", [["l", "summe"], ["sum", 0]]],
-  ["score",  [["round", 0]]]
-]];

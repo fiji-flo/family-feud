@@ -1,5 +1,7 @@
 "use strict";
 
+const $ = (...args) => document.querySelector(...args);
+
 const EMPTY_ANSWER = "...................";
 const EMPTY_SHORT_ANSWER = ".............";
 const EMPTY_POINTS = "--";
@@ -15,7 +17,7 @@ const ROUND_FIELDS = n => {
   return [ "r", [
     ["answers", answers],
     ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 0]]],
-    ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
+    ["score",  [["teamA", 0], ["rsum", 0], ["teamB", 0]]]
   ]];
 };
 
@@ -38,7 +40,7 @@ const FINAL_FIELD = [ "f", [
       ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
     ]]]],
   ["points", [["l", "summe"], ["sum", 0]]],
-  ["score",  [["round", 0]]]
+  ["score",  [["rsum", 0]]]
 ]];
 
 function createDivs(div, row, prefix, def=false) {
@@ -62,7 +64,7 @@ function createDivs(div, row, prefix, def=false) {
 
 function setField(to) {
   let [prefix, round] = to;
-  document.body.removeChild(document.querySelector("#field"));
+  document.body.removeChild($("#field"));
   const field = document.createElement("div");
   field.setAttribute("id", "field");
   field.setAttribute("class", prefix);

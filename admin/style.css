@@ -10,6 +10,14 @@
     cursor: pointer;
 }
 
+.teamA {
+    cursor: pointer;
+}
+
+.teamB {
+    cursor: pointer;
+}
+
 .x {
     min-height: 1em;
     cursor: pointer;

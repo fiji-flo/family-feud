@@ -1,6 +1,8 @@
 "use strict";
 
 const QUESTIONS = [0, 6, 5, 4, 3];
+const MULTI = [0, 1, 1, 2, 3];
+const NROUNDS = 4;
 const ACTION = {
   "q": (t) => {
     for (let d of document.querySelectorAll(".selected")) {
@@ -11,21 +13,47 @@ const ACTION = {
     sendRound();
   },
   "a": (t) => {
-    maker(t);
+    marker(t);
     sendRound();
   },
   "p": (t ,n) => {
-    maker(t);
+    marker(t);
     sum(n);
     sendRound();
   },
   "x": (t, n) => {
     t.textContent = `${t.textContent}X`;
     sendRound();
+  },
+  "teamA": (t, n) => {
+    marker(t);
+    updateScores();
+  },
+  "teamB": (t, n) => {
+    marker(t);
+    updateScores();
   }
 };
 
 const ws = new WebSocket("ws://localhost:8081");
+
+function updateScores() {
+  let scoreA = 0;
+  let scoreB = 0;
+  for (let i = 1; i <= NROUNDS; ++i) {
+    const rsum = parseInt($(`#round${i} .rsum`).textContent);
+    const teamA = $(`#round${i} .teamA`);
+    const teamB = $(`#round${i} .teamB`);
+    if (teamA.classList.contains("marked")) {
+      scoreA = scoreA + rsum;
+    }
+    if (teamB.classList.contains("marked")) {
+      scoreB = scoreB + rsum;
+    }
+    teamA.textContent = scoreA;
+    teamB.textContent = scoreB;
+  }
+}
 
 function sum(n) {
   const selector = `#round${n} .p.marked`;
@@ -34,8 +62,8 @@ function sum(n) {
   for (let div of divs) {
     sum = sum + parseInt(div.textContent);
   }
-  console.log(sum);
-  document.querySelector(`#round${n} .sum`).textContent = sum;
+  $(`#round${n} .sum`).textContent = sum;
+  $(`#round${n} .rsum`).textContent = (sum * MULTI[n]);
 }
 
 function DIV() {
@@ -66,7 +94,7 @@ function serialize(div) {
 }
 
 function serializeRound(number) {
-  const round = document.querySelector(`#round${number} .r`);
+  const round = $(`#round${number} .r`);
   const field = serialize(round);
   return field;
 }
@@ -114,7 +142,7 @@ function populateRoundAnswers(round, rNumber, answers) {
   }
 }
 
-function makeRound(number) {
+function markeround(number) {
   let [prefix, round] = ROUND_FIELDS(number);
   const div = CCDIV(prefix);
   createDivs(div, round, prefix, true);
@@ -122,24 +150,27 @@ function makeRound(number) {
 }
 
 function displayRound(number, question, answers) {
-  const oldRound = document.querySelector(`#round${number}`);
+  const oldRound = $(`#round${number}`);
   const newRound = DIV();
   newRound.setAttribute("id", `round${number}`);
   const label = CCDIV("q", `${number}: ${question}`);
   label.setAttribute("round", number);
   label.addEventListener("click", e => ACTION["q"](e.target, number));
   newRound.appendChild(label);
-  newRound.appendChild(makeRound(QUESTIONS[number]));
+  newRound.appendChild(markeround(QUESTIONS[number]));
 
   const parent = oldRound.parentNode;
   parent.replaceChild(newRound, oldRound);
   populateRoundAnswers(newRound, number, answers.slice(0, QUESTIONS[number]));
-  newRound.querySelector(".x").addEventListener("click", e => {
-    ACTION["x"](e.target, number);
-  });
+  const events = ["x", "teamA", "teamB"];
+  for (let c of events) {
+    newRound.querySelector(`.${c}`).addEventListener("click", e => {
+      ACTION[c](e.target, number);
+    });
+  }
 }
 
-function maker(t) {
+function marker(t) {
   const cls = t.classList;
   if (cls.contains("marked") && window.confirm("sure?")) {
     cls.remove("marked");
@@ -149,12 +180,21 @@ function maker(t) {
 }
 
 function sendRound() {
-  const number = document.querySelector(".selected");
+  const number = $(".selected");
   if (number && number.hasAttribute("round")) {
-    const round = JSON.stringify(serializeRound(number.getAttribute("round")));
+    const round = serializeRound(number.getAttribute("round"));
+    const message = JSON.stringify({t: "update", payload: round});
     console.log(round);
-    ws.send(round);
+    ws.send(message);
   }
 }
+
+
+(() => {
+  const b = $("#wrong");
+  b.addEventListener("click", () => {
+    ws.send(JSON.stringify({t: "sound", payload: 2}));
+  });
+})();
 
 loadGame(DATA);
