@@ -47,7 +47,7 @@
     margin-right: 2%;
 }
 
-.f .points .p {
+.f .points .sum {
     margin-right: 2%;
 }
 
@@ -107,7 +107,7 @@
     margin-left: 10%;
 }
 
-.r .points .p {
+.r .points .sum {
     align-self: flex-end;
     width: 10%;
     text-align: right;

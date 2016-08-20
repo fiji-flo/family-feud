@@ -9,7 +9,9 @@ const SPECIAL_FIELDS = {
 };
 
 
-let current = {};
+const ws = new WebSocket("ws://localhost:8080");
+
+let current = [];
 const samples = new Samples(new AudioContext());
 
 function arr(arg) {
@@ -44,6 +46,7 @@ function updateField(selector, from, to) {
   }
 }
 
+
 function reduce(list, reduced, prefix) {
   for (let [k,v] of list) {
     const label = `${prefix}-${k}`;
@@ -55,12 +58,20 @@ function reduce(list, reduced, prefix) {
   }
 }
 
-function reduceRound(list) {
+function reduceAnswers(list) {
   let [prefix, round] = list;
   const reduced = [];
-  reduce(round, reduced, prefix);
+  reduce([round[0]], reduced, prefix);
   return reduced;
 }
+
+function reduceAllPoints(list) {
+  let [prefix, round] = list;
+  const reduced = [];
+  reduce([round[1], round[2]], reduced, prefix);
+  return reduced;
+}
+
 
 function oneDiff(a, b) {
   let changed = [];
@@ -68,11 +79,7 @@ function oneDiff(a, b) {
     for (let i = 0; i < a.length; ++i) {
       if (a[i][0] === b[i][0]) {
         if (a[i][1] !== b[i][1]) {
-          if (changed.length === 0) {
-            changed = [a[i], b[i]];
-          } else {
-            return DIFF_RESET;
-          }
+          changed.push([a[i], b[i]]);
         }
       } else {
         return DIFF_RESET;
@@ -85,20 +92,32 @@ function oneDiff(a, b) {
 }
 
 function update(from, to) {
-  const change = oneDiff(reduceRound(from), reduceRound(to));
-  if (change === DIFF_RESET) {
+  const change = oneDiff(reduceAnswers(from), reduceAnswers(to));
+  if (change === DIFF_RESET || change.length > 1) {
     console.log("DOOM");
     current = setField(to);
-  } else if (change.length === 0) {
-    return;
   } else {
-    updateField(change[0][0], change[0][1], change[1][1]);
+    if (change.length === 0) {
+      console.log("NOOP");
+      return;
+    } else {
+      updateField(change[0][0][0], change[0][0][1], change[0][1][1]);
+    }
+    const pointChanges = oneDiff(reduceAllPoints(from), reduceAllPoints(to));
+    for (let change of pointChanges) {
+      console.log(change);
+      updateField(change[0][0], change[0][1], change[1][1]);
+    }
   }
   current = to;
 }
 
+ws.onmessage = e => {
+  update(current, JSON.parse(e.data));
+};
 
-setField(FINAL_FIELD);
+
+current = setField(FINAL_FIELD);
 
 const TEST_X = ["r", [
   ["answers", [
@@ -109,7 +128,7 @@ const TEST_X = ["r", [
     ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
   ]],
-  ["points", [["x", "x"], ["l", "summe"], ["p", 0]]],
+  ["points", [["x", "x"], ["l", "summe"], ["sum", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
 ]];
 
@@ -122,8 +141,8 @@ const TEST_A = ["r", [
     ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
   ]],
-  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
-  ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
+  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 2]]],
+  ["score",  [["teamA", 123], ["round", 66], ["teamB", 0]]]
 ]];
 const TEST_P = ["r", [
   ["answers", [
@@ -134,7 +153,7 @@ const TEST_P = ["r", [
     ["a5",  [["l", 5], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]],
     ["a6",  [["l", 6], ["a", EMPTY_ANSWER ], ["p", EMPTY_POINTS ]]]
   ]],
-  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
+  ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 0]]],
   ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
 ]];
 
@@ -154,6 +173,6 @@ const TEST_F = [ "f", [
       ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
       ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
     ]]]],
-  ["points", [["l", "summe"], ["p", 0]]],
+  ["points", [["l", "summe"], ["sum", 0]]],
   ["score",  [["round", 0]]]
 ]];

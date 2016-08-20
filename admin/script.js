@@ -3,6 +3,8 @@
 const QUESTIONS = [0, 6, 5, 4, 3];
 const SELECTABLE = [".a", ".p"];
 
+const ws = new WebSocket("ws://localhost:8081");
+
 function DIV() {
   return document.createElement("div");
 }
@@ -19,7 +21,11 @@ function CCDIV(cls, content) {
 function serialize(div) {
   const cls = div.classList.item(0);
   if (div.childElementCount === 0) {
-    return [cls, div.textContent];
+    if (div.classList.contains("marked")) {
+      return [cls, div.textContent];
+    } else {
+      return [cls, div.getAttribute("def")];
+    }
   } else {
     return [cls, [...div.childNodes].map(d => serialize(d))];
   }
@@ -28,6 +34,7 @@ function serialize(div) {
 function serializeRound() {
   const round = document.querySelector("#round .r");
   const field = serialize(round);
+  return field;
 }
 
 function loadGame(data) {
@@ -81,7 +88,7 @@ function populateRoundAnswers(answers) {
 function makeRound(number) {
   let [prefix, round] = ROUND_FIELDS(number);
   const div = CCDIV(prefix);
-  createDivs(div, round, prefix);
+  createDivs(div, round, prefix, true);
   return div;
 }
 
@@ -112,6 +119,11 @@ function clicky(selector) {
 
 function update() {
   SELECTABLE.forEach(s => clicky(s));
+}
+
+function sendRound() {
+  const round = JSON.stringify(serializeRound());
+  ws.send(round);
 }
 
 loadGame(DATA);

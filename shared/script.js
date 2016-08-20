@@ -14,7 +14,7 @@ const ROUND_FIELDS = n => {
   }
   return [ "r", [
     ["answers", answers],
-    ["points", [["x", EMPTY_XXX], ["l", "summe"], ["p", 0]]],
+    ["points", [["x", EMPTY_XXX], ["l", "summe"], ["sum", 0]]],
     ["score",  [["teamA", 0], ["round", 0], ["teamB", 0]]]
   ]];
 };
@@ -37,11 +37,11 @@ const FINAL_FIELD = [ "f", [
       ["a4", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
       ["a5", [["a", EMPTY_SHORT_ANSWER ], ["p", EMPTY_POINTS ]]],
     ]]]],
-  ["points", [["l", "summe"], ["p", 0]]],
+  ["points", [["l", "summe"], ["sum", 0]]],
   ["score",  [["round", 0]]]
 ]];
 
-function createDivs(div, row, prefix) {
+function createDivs(div, row, prefix, def=false) {
   for (let e of row) {
     let [childId, other] = e;
     const childDiv = document.createElement("div");
@@ -50,9 +50,12 @@ function createDivs(div, row, prefix) {
     childDiv.setAttribute("class", childId);
     div.appendChild(childDiv);
     if (other instanceof Array) {
-      createDivs(childDiv, other, id) ;
+      createDivs(childDiv, other, id, def) ;
     } else {
       childDiv.textContent = other;
+      if (def) {
+        childDiv.setAttribute("def", other);
+      }
     }
   }
 }
