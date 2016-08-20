@@ -99,7 +99,6 @@ function update(from, to) {
   } else {
     if (change.length === 0) {
       console.log("NOOP");
-      return;
     } else {
       updateField(change[0][0][0], change[0][0][1], change[0][1][1]);
     }

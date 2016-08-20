@@ -6,6 +6,16 @@
     cursor: pointer;
 }
 
+.q {
+    cursor: pointer;
+}
+
+.x {
+    min-height: 1em;
+    cursor: pointer;
+    background-color: rgba(127, 0, 0, 0.3);
+}
+
 .round-selector {
     cursor: pointer;
 }

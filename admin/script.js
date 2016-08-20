@@ -1,9 +1,42 @@
 "use strict";
 
 const QUESTIONS = [0, 6, 5, 4, 3];
-const SELECTABLE = [".a", ".p"];
+const ACTION = {
+  "q": (t) => {
+    for (let d of document.querySelectorAll(".selected")) {
+      d.classList.remove("selected");
+    }
+    const cls = t.classList;
+    cls.add("selected");
+    sendRound();
+  },
+  "a": (t) => {
+    maker(t);
+    sendRound();
+  },
+  "p": (t ,n) => {
+    maker(t);
+    sum(n);
+    sendRound();
+  },
+  "x": (t, n) => {
+    t.textContent = `${t.textContent}X`;
+    sendRound();
+  }
+};
 
 const ws = new WebSocket("ws://localhost:8081");
+
+function sum(n) {
+  const selector = `#round${n} .p.marked`;
+  const divs = document.querySelectorAll(selector);
+  let sum = 0;
+  for (let div of divs) {
+    sum = sum + parseInt(div.textContent);
+  }
+  console.log(sum);
+  document.querySelector(`#round${n} .sum`).textContent = sum;
+}
 
 function DIV() {
   return document.createElement("div");
@@ -21,18 +54,19 @@ function CCDIV(cls, content) {
 function serialize(div) {
   const cls = div.classList.item(0);
   if (div.childElementCount === 0) {
-    if (div.classList.contains("marked")) {
-      return [cls, div.textContent];
-    } else {
+    if ((div.classList.contains("a") || div.classList.contains("p")) &&
+      !div.classList.contains("marked")) {
       return [cls, div.getAttribute("def")];
+    } else {
+      return [cls, div.textContent];
     }
   } else {
     return [cls, [...div.childNodes].map(d => serialize(d))];
   }
 }
 
-function serializeRound() {
-  const round = document.querySelector("#round .r");
+function serializeRound(number) {
+  const round = document.querySelector(`#round${number} .r`);
   const field = serialize(round);
   return field;
 }
@@ -40,19 +74,9 @@ function serializeRound() {
 function loadGame(data) {
   let [roundsSection, finalSection] = data.split("#final\n");
   const rounds = loadRounds(roundsSection);
-  const roundControl = document.querySelector("#round-control");
   for (let round of rounds) {
     let [n, q, a] = round;
-    const button = CCDIV("round-selector", `round ${n}`);
-    button.addEventListener("click", e => {
-      for (let d of document.querySelectorAll(".selected")) {
-        d.classList.remove("selected");
-      }
-      const cls = e.target.classList;
-      cls.add("selected");
-      displayRound(n, q, a);
-    });
-    roundControl.appendChild(button);
+    displayRound(n, q, a);
   }
 }
 
@@ -68,20 +92,25 @@ function loadRounds(roundsString) {
   });
 }
 
-function populateRoundAnswer(number, line) {
+function populateRoundAnswer(round, rNumber, aNumber, line) {
   const setContent = (cls, content) => {
-    document.querySelector(`.answers .a${number} .${cls}`).textContent = content;
+    const div = round.querySelector(`.answers .a${aNumber} .${cls}`);
+    div.textContent = content;
+    if (cls in ACTION) {
+      div.addEventListener("click", e => ACTION[cls](e.target, rNumber));
+    }
+
   };
   let [answer, points] = line.split(";");
-  setContent("l", number);
+  setContent("l", aNumber);
   setContent("a", answer);
   setContent("p", points);
 }
 
-function populateRoundAnswers(answers) {
+function populateRoundAnswers(round, rNumber, answers) {
   let i = 1;
   for (let answer of answers) {
-   populateRoundAnswer(i++, answer);
+    populateRoundAnswer(round, rNumber, i++, answer);
   }
 }
 
@@ -93,37 +122,39 @@ function makeRound(number) {
 }
 
 function displayRound(number, question, answers) {
-  const oldRound = document.querySelector("#round");
+  const oldRound = document.querySelector(`#round${number}`);
   const newRound = DIV();
-  newRound.setAttribute("id", "round");
-  newRound.appendChild(CCDIV("q", `${number}: ${question}`));
+  newRound.setAttribute("id", `round${number}`);
+  const label = CCDIV("q", `${number}: ${question}`);
+  label.setAttribute("round", number);
+  label.addEventListener("click", e => ACTION["q"](e.target, number));
+  newRound.appendChild(label);
   newRound.appendChild(makeRound(QUESTIONS[number]));
 
   const parent = oldRound.parentNode;
   parent.replaceChild(newRound, oldRound);
-  populateRoundAnswers(answers.slice(0, QUESTIONS[number]));
-  update();
+  populateRoundAnswers(newRound, number, answers.slice(0, QUESTIONS[number]));
+  newRound.querySelector(".x").addEventListener("click", e => {
+    ACTION["x"](e.target, number);
+  });
 }
 
-function clicky(selector) {
-  const divs = document.querySelectorAll(selector);
-  divs.forEach(d => d.addEventListener("click", e => {
-    const cls = e.target.classList;
-    if (cls.contains("marked") && window.confirm("sure?")) {
-      cls.remove("marked");
-    } else {
-      cls.add("marked");
-    }
-  }));
-}
-
-function update() {
-  SELECTABLE.forEach(s => clicky(s));
+function maker(t) {
+  const cls = t.classList;
+  if (cls.contains("marked") && window.confirm("sure?")) {
+    cls.remove("marked");
+  } else {
+    cls.add("marked");
+  }
 }
 
 function sendRound() {
-  const round = JSON.stringify(serializeRound());
-  ws.send(round);
+  const number = document.querySelector(".selected");
+  if (number && number.hasAttribute("round")) {
+    const round = JSON.stringify(serializeRound(number.getAttribute("round")));
+    console.log(round);
+    ws.send(round);
+  }
 }
 
 loadGame(DATA);
