@@ -166,8 +166,9 @@ function displayRound(number, question, answers) {
   populateRoundAnswers(newRound, number, answers.slice(0, QUESTIONS[number]));
   const events = ["x", "teamA", "teamB"];
   for (let c of events) {
+    let action = ACTION[c];
     newRound.querySelector(`.${c}`).addEventListener("click", e => {
-      ACTION[c](e.target, number);
+      action(e.target, number);
     });
   }
 }
