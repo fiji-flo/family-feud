@@ -194,10 +194,13 @@ function sendRound() {
 
 
 (() => {
-  const b = $("#wrong");
-  b.addEventListener("click", () => {
+  $("#wrong").addEventListener("click", () => {
     ws.send(JSON.stringify({t: "sound", payload: 2}));
   });
+  $("#game1").addEventListener("click", () => {
+    loadGame(GAME1);
+  });
+  $("#game2").addEventListener("click", () => {
+    loadGame(GAME2);
+  });
 })();
-
-loadGame(DATA);
