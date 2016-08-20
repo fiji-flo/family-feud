@@ -11,7 +11,7 @@ const SPECIAL_FIELDS = {
 
 const ws = new WebSocket("ws://localhost:8080");
 
-let current = [];
+let current;
 const samples = new Samples(new AudioContext());
 
 function arr(arg) {
@@ -91,7 +91,12 @@ function oneDiff(a, b) {
   return changed;
 }
 
-function update(from, to) {
+function update(from, to, force=false) {
+  if (force) {
+    current = setField(to);
+    scale();
+    return;
+  }
   const change = oneDiff(reduceAnswers(from), reduceAnswers(to));
   if (change === DIFF_RESET || change.length > 1) {
     console.log("DOOM");
@@ -109,12 +114,54 @@ function update(from, to) {
     }
   }
   current = to;
+  scale();
 }
 
+function scale() {
+  const field = $("#field");
+  const denominator = Math.max(
+    field.clientWidth / window.innerWidth,
+    field.clientHeight / window.innerHeight
+  );
+
+  field.style.transform = `scale(${(1 / denominator)})`;
+}
+
+
+
+(function() {
+    const throttle = (type, name, obj) => {
+        obj = obj || window;
+        let running = false;
+        const func = () => {
+            if (running) { return; }
+            running = true;
+             requestAnimationFrame(function() {
+                obj.dispatchEvent(new CustomEvent(name));
+                running = false;
+            });
+        };
+        obj.addEventListener(type, func);
+    };
+
+    /* init - you can init any event */
+    throttle("resize", "optimizedResize");
+})();
+
+// handle event
+window.addEventListener("optimizedResize", scale);
+
+
+
+scale();
 ws.onmessage = e => {
   const {t, payload} = JSON.parse(e.data);
   if (t === "update") {
-    update(current, payload);
+    if (typeof current === "undefined") {
+      update(current, payload, true);
+    } else {
+      update(current, payload);
+    }
   } else if (t === "sound") {
     samples.play(payload);
   }

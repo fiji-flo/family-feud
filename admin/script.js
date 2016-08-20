@@ -28,10 +28,12 @@ const ACTION = {
   "teamA": (t, n) => {
     marker(t);
     updateScores();
+    sendRound();
   },
   "teamB": (t, n) => {
     marker(t);
     updateScores();
+    sendRound();
   }
 };
 
